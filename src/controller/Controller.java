@@ -45,7 +45,6 @@ public class Controller
 
 		listaMes = new String[]{"January" , "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 		colaInfracciones  =  new Queue<VOMovingViolation>() ;
-		colaPrioridad = new ColaPrioridad<String, VOMovingViolation>();
 	}
 
 
@@ -76,10 +75,11 @@ public class Controller
 			limInf = 6;
 		}
 		String dataFile;
+		int anterior = 0;
+		int totalMes = 0;
 
 		try{
 			for(int f = limInf ; f < limSup ; f++){
-				view.printMensage(listaMes[f]);
 				dataFile = "." + File.separator + "data" + File.separator + "Moving_Violations_Issued_in_" + listaMes[f] + "_2018.csv";
 				FileReader n1 = new FileReader(dataFile);
 				CSVReader n2 = new CSVReaderBuilder(n1).withSkipLines(1).build();
@@ -87,13 +87,23 @@ public class Controller
 
 				for(int j = 0 ; j < info.size() ; j++){
 					VOMovingViolation infraccion = new VOMovingViolation(info.get(f)[0], info.get(f)[2], info.get(f)[13],info.get(f)[9], info.get(f)[12], info.get(f)[15]);
-					colaPrioridad.insertar(infraccion.getAccidentIndicator(), infraccion);
-					//colaInfracciones.enqueue(infraccion);
+					//colaPrioridad.insertar(infraccion.getAccidentIndicator(), infraccion);
+					colaInfracciones.enqueue(infraccion);
 
-					}
+				}
 				n1.close();
 				n2.close();
 
+				if (anterior == 0){
+					anterior = colaInfracciones.size();
+					totalMes = colaInfracciones.size();
+				}
+				else{
+					totalMes = colaInfracciones.size() - anterior;
+					anterior = colaInfracciones.size();
+				}
+
+				view.printMensage(listaMes[f] + " - " + totalMes);
 			}
 		}
 		catch (Exception e)
@@ -101,18 +111,18 @@ public class Controller
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-		return colaPrioridad.darLongitud();
+		return colaInfracciones.size();
 
 	}
 
-
-
-
+	public VOMovingViolation darPorObjectId(String id){
+		return arbolito.get(id);
+	}
 
 
 	public void run()
 	{
-
+		int nDatos = 0;
 		Scanner sc = new Scanner(System.in);
 		boolean fin = false;
 
