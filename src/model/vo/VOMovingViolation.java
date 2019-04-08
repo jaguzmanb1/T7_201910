@@ -9,32 +9,64 @@ public class VOMovingViolation implements Comparable<VOMovingViolation>
 	// TODO Definir los atributos de una infraccion
 
 
-	private String objectId;
-	private String location;
-	private String ticketIssueDate;
-	private String totalPaid;
-	private String accidentIndicator;
-	private String violationDescription;
+	private String OBJECTID;
+	private String LOCATION;
+	private String TICKETISSUEDATE;
+	private String ACCIDENTINDICATOR;
+	private String XCOORD;
+	private String YCOORD;
+	private String ADDRESS_ID;
+	private String STREETSEGID;
+	
 
 
 	/**
 	 * constructor
 	 */
-	public VOMovingViolation(String pObjectId, String pLocation, String pTicketIssueDate, String pTotalPaid, String pAccidentIndicator,String pViolationDescription){
-		objectId = pObjectId;
-		location=pLocation;
-		ticketIssueDate=pTicketIssueDate;
-		totalPaid = pTotalPaid;
-		accidentIndicator=pAccidentIndicator;
-		violationDescription=pViolationDescription;
+	public VOMovingViolation(String pObjectId, String pLocation, String pTicketIssueDate, String pTotalPaid, String pAccidentIndicator,String pViolationDescription,String pXCOORD,String pYCOORD, String pADDRESS_ID, String pSTREETSEGID){
+		OBJECTID = pObjectId;
+		LOCATION=pLocation;
+		TICKETISSUEDATE=pTicketIssueDate;
+		ACCIDENTINDICATOR=pAccidentIndicator;
+		XCOORD = pXCOORD;
+		YCOORD = pYCOORD;
+		ADDRESS_ID = pADDRESS_ID;
+		STREETSEGID = pSTREETSEGID;
+		
 	}
+	
+	public String getSTREETSEGID() 
+	{
+		// TODO Auto-generated method stub
+		return STREETSEGID;
+	}
+	
+	public String getADDRESS_ID() 
+	{
+		// TODO Auto-generated method stub
+		return ADDRESS_ID;
+	}
+	
+	public String getYCOORD() 
+	{
+		// TODO Auto-generated method stub
+		return YCOORD;
+	}
+	
+	
+	public String getXCOORD() 
+	{
+		// TODO Auto-generated method stub
+		return XCOORD;
+	}	
+	
 	/**
 	 * @return id 
 	 */
-	public String objectId() 
+	public String getObjectid() 
 	{
 		// TODO Auto-generated method stub
-		return objectId;
+		return OBJECTID;
 	}	
 
 	/**
@@ -42,7 +74,7 @@ public class VOMovingViolation implements Comparable<VOMovingViolation>
 	 */
 	public String getLocation() {
 		// TODO Auto-generated method stub
-		return location;
+		return LOCATION;
 	}
 
 	/**
@@ -50,15 +82,7 @@ public class VOMovingViolation implements Comparable<VOMovingViolation>
 	 */
 	public String getTicketIssueDate() {
 		// TODO Auto-generated method stub
-		return ticketIssueDate;
-	}
-
-	/**
-	 * @return totalPaid 
-	 */
-	public int getTotalPaid() {
-		// TODO Auto-generated method stub
-		return Integer.parseInt(totalPaid);
+		return TICKETISSUEDATE;
 	}
 
 	/**
@@ -66,33 +90,21 @@ public class VOMovingViolation implements Comparable<VOMovingViolation>
 	 */
 	public String  getAccidentIndicator() {
 		// TODO Auto-generated method stub
-		return accidentIndicator;
+		return ACCIDENTINDICATOR;
 	}
 
-	/**
-	 * @return description 
-	 */
-	public String  getViolationDescription() {
-		// TODO Auto-generated method stub
-		return violationDescription;
-	}
 
 	@Override
 	public int compareTo(VOMovingViolation o) 
 	{
 		// TODO implementar la comparacion "natural" de la clase
-		int rta=ticketIssueDate.compareTo(o.getTicketIssueDate());
+		int rta= TICKETISSUEDATE.compareTo(o.getTicketIssueDate());
 		if(rta==0)
 		{
-	        rta=objectId.compareTo(o.objectId);
+	        rta=OBJECTID.compareTo(o.OBJECTID);
 		}
 		
 		return rta;
 	}
 
-	public String toString()
-	{
-		// TODO Convertir objeto en String (representacion que se muestra en la consola)
-		return objectId + " - " + location + " - " + ticketIssueDate + " - " + totalPaid + "- " + violationDescription;
-	}
 }

@@ -1,4 +1,5 @@
 package controller;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
@@ -17,14 +18,16 @@ import java.util.Scanner;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
-import model.data.structures.ColaPrioridad;
 import model.data.structures.Queue;
+import model.data.structures.RedBlackBST;
 import model.vo.VOMovingViolation;
 import view.MovingViolationsManagerView;
 
 @SuppressWarnings("unused")
 public class Controller
 {
+	private RedBlackBST<String, VOMovingViolation> arbol;
+
 	private MovingViolationsManagerView view ;
 
 	// TODO Definir las estructuras de datos para cargar las infracciones del periodo definido
@@ -36,14 +39,15 @@ public class Controller
 	// Copia de la muestra de datos a ordenar
 	Comparable<VOMovingViolation> [ ] muestraCopia ;
 
-	ColaPrioridad<String, VOMovingViolation> colaPrioridad;
 
 	private String[] listaMes;
 
 	public Controller() {
 		view = new MovingViolationsManagerView();
+		
+		arbol = new RedBlackBST<String, VOMovingViolation>();
 
-		listaMes = new String[]{"January" , "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+		listaMes = new String[]{"January" , "February", "March", "April", "May", "June"};
 		colaInfracciones  =  new Queue<VOMovingViolation>() ;
 	}
 
@@ -61,68 +65,45 @@ public class Controller
 	 * @return numero de infracciones leidas rden como estan los
 	 */
 
-	public int loadMovingViolations(int pSemestre)
+	public int loadMovingViolations()
 	{
-		int limSup;
-		int limInf;
-
-		if ( pSemestre == 1 ){
-			limSup = 6;
-			limInf = 0;
-		}
-		else{
-			limSup = 12;
-			limInf = 6;
-		}
-		String dataFile;
-		int anterior = 0;
-		int totalMes = 0;
-
-		try{
-			for(int f = limInf ; f < limSup ; f++){
-				dataFile = "." + File.separator + "data" + File.separator + "Moving_Violations_Issued_in_" + listaMes[f] + "_2018.csv";
-				FileReader n1 = new FileReader(dataFile);
-				CSVReader n2 = new CSVReaderBuilder(n1).withSkipLines(1).build();
-				List <String[]> info = n2.readAll();
-
-				for(int j = 0 ; j < info.size() ; j++){
-					VOMovingViolation infraccion = new VOMovingViolation(info.get(f)[0], info.get(f)[2], info.get(f)[13],info.get(f)[9], info.get(f)[12], info.get(f)[15]);
-					//colaPrioridad.insertar(infraccion.getAccidentIndicator(), infraccion);
-					colaInfracciones.enqueue(infraccion);
-
+		Gson gson = new Gson();
+		JsonReader reader = null;
+		try {        
+			VOMovingViolation[] reviews = null;
+			for( int i = 0 ; i < 5 ; i++){
+				reader = new JsonReader(new FileReader("./data/Moving_Violations_Issued_in_"+ listaMes[i] + "_2018.json"));
+				reviews = gson.fromJson(reader, VOMovingViolation[].class);
+				view.printMensage("Se cargaron " + reviews.length + " registros del mes de " + listaMes[i]);
+				for(int j = 0; j < reviews.length; j++)
+				{
+					arbol.put(reviews[j].getObjectid(), reviews[j]);
 				}
-				n1.close();
-				n2.close();
-
-				if (anterior == 0){
-					anterior = colaInfracciones.size();
-					totalMes = colaInfracciones.size();
-				}
-				else{
-					totalMes = colaInfracciones.size() - anterior;
-					anterior = colaInfracciones.size();
-				}
-
-				view.printMensage(listaMes[f] + " - " + totalMes);
+				
 			}
-		}
-		catch (Exception e)
-		{
-			// TODO: handle exception
+
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		return colaInfracciones.size();
 
+		return arbol.size();
 	}
 
 	public VOMovingViolation darPorObjectId(String id){
-		return arbolito.get(id);
+		return arbol.get(id);
+	}
+	
+	public Queue<VOMovingViolation> darPorObjectIdRango(String idInicial, String idFinal){
+		Queue<VOMovingViolation> violations = new Queue<VOMovingViolation>();
+		for (String key : arbol.keys(idInicial, idFinal)){
+			violations.enqueue(arbol.get(key));
+		}
+		return violations;
 	}
 
 
 	public void run()
 	{
-		int nDatos = 0;
 		Scanner sc = new Scanner(System.in);
 		boolean fin = false;
 
@@ -136,18 +117,34 @@ public class Controller
 			{
 			case 1:
 				// Cargar infracciones
-				view.printMensage("Dar semestre: ");
-				Scanner semestre = new Scanner(System.in);
-				int semestren = semestre.nextInt();
-				nDatos = this.loadMovingViolations(semestren);
+				int suma = 0;
+				int nDatos = this.loadMovingViolations();
 
 				view.printMensage("Numero infracciones cargadas:" + nDatos);
 				break;
 
 			case 2:
+				Scanner sc1 = new Scanner(System.in);
+				view.printMensage("ObjectID: ");
+				String id = sc1.nextLine();
+				VOMovingViolation object = this.darPorObjectId(id);
+				view.printDatosMuestra(object.getLocation(), object.getADDRESS_ID(), object.getSTREETSEGID(), object.getXCOORD(), object.getYCOORD(), object.getTicketIssueDate());
 				break;
 
 			case 3:
+				Scanner sc2 = new Scanner(System.in);
+				view.printMensage("ObjectID menor: ");
+				String idInicial = sc2.nextLine();
+				
+				view.printMensage("ObjectID mayor: ");
+				String idFinal = sc2.nextLine();
+				
+				Queue<VOMovingViolation> violations = this.darPorObjectIdRango(idInicial, idFinal);
+				
+				for (VOMovingViolation violation : violations){
+					view.printDatosMuestra(violation.getLocation(), violation.getADDRESS_ID(), violation.getSTREETSEGID(), violation.getXCOORD(), violation.getYCOORD(), violation.getTicketIssueDate());
+				}
+				
 				break;
 
 			case 4:
