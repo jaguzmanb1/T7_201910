@@ -12,7 +12,6 @@ public class VOMovingViolation implements Comparable<VOMovingViolation>
 	private String OBJECTID;
 	private String LOCATION;
 	private String TICKETISSUEDATE;
-	private String ACCIDENTINDICATOR;
 	private String XCOORD;
 	private String YCOORD;
 	private String ADDRESS_ID;
@@ -27,7 +26,6 @@ public class VOMovingViolation implements Comparable<VOMovingViolation>
 		OBJECTID = pObjectId;
 		LOCATION=pLocation;
 		TICKETISSUEDATE=pTicketIssueDate;
-		ACCIDENTINDICATOR=pAccidentIndicator;
 		XCOORD = pXCOORD;
 		YCOORD = pYCOORD;
 		ADDRESS_ID = pADDRESS_ID;
@@ -83,14 +81,6 @@ public class VOMovingViolation implements Comparable<VOMovingViolation>
 	public String getTicketIssueDate() {
 		// TODO Auto-generated method stub
 		return TICKETISSUEDATE;
-	}
-
-	/**
-	 * @return accidentIndicator 
-	 */
-	public String  getAccidentIndicator() {
-		// TODO Auto-generated method stub
-		return ACCIDENTINDICATOR;
 	}
 
 
